@@ -9,9 +9,11 @@ from PySide import QtGui, QtCore
 from view.gui_main import Ui_MainWindow
 from view.gui_crest import Ui_CrestDialog
 from view.gui_tripwire import Ui_TripwireDialog
+from view.gui_bridge import Ui_BridgeDialog
 from view.gui_about import Ui_AboutDialog
 from model.navigation import Navigation
 from model.navprocessor import NavProcessor
+from model.bridgeprocessor import BridgeProcessor
 from model.evedb import EveDb
 from model.crestprocessor import CrestProcessor
 from model.versioncheck import VersionCheck
@@ -62,6 +64,14 @@ class CrestDialog(QtGui.QDialog, Ui_CrestDialog):
     def stuff(self):
         self._credentials_enable(not self.radioButton_implicit.isChecked())
 
+class BridgeDialog(QtGui.QDialog, Ui_BridgeDialog):
+    """
+    Bridge network configuration Window
+    """
+    def __init__(self, bridge_url, parent=None):
+        super(BridgeDialog, self).__init__(parent)
+        self.setupUi(self)
+        self.lineEdit_url.setText(bridge_url)
 
 class TripwireDialog(QtGui.QDialog, Ui_TripwireDialog):
     """
@@ -121,6 +131,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         )
 
         self.scene_banner = None
+        self.bridge_url = None
         self.tripwire_url = None
         self.tripwire_user = None
         self.tripwire_pass = None
@@ -174,6 +185,13 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.nav_processor.finished.connect(self.thread_done)
         # noinspection PyUnresolvedReferences
         self.worker_thread.started.connect(self.nav_processor.process)
+
+        #Bridge thread
+        self.bridge_thread = QtCore.QThread()
+        self.bridge_processor = BridgeProcessor(self.nav)
+        self.bridge_processor.moveToThread(self.bridge_thread)
+        self.bridge_processor.finished.connect(self.bridge_thread_done)
+        self.bridge_thread.started.connect(self.bridge_processor.process)
 
         # Version check thread
         self.version_thread = QtCore.QThread()
@@ -229,6 +247,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.pushButton_crest_config.clicked.connect(self.btn_crest_config_clicked)
         self.pushButton_trip_config.clicked.connect(self.btn_trip_config_clicked)
         self.pushButton_trip_get.clicked.connect(self.btn_trip_get_clicked)
+        self.pushButton_bridge_conf.clicked.connect(self.btn_bridge_config_clicked)
+        self.pushButton_bridge.clicked.connect(self.btn_bridge_get_clicked)
         self.pushButton_avoid_add.clicked.connect(self.btn_avoid_add_clicked)
         self.pushButton_avoid_delete.clicked.connect(self.btn_avoid_delete_clicked)
         self.pushButton_avoid_clear.clicked.connect(self.btn_avoid_clear_clicked)
@@ -262,6 +282,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.tripwire_url = self.settings.value("tripwire_url", "https://tripwire.eve-apps.com")
         self.tripwire_user = self.settings.value("tripwire_user", "username")
         self.tripwire_pass = self.settings.value("tripwire_pass", "password")
+
+        #Bridge info
+        self.bridge_url = self.settings.value("bridge_url", "")
 
         # Eve-Scout
         self.evescout_enable = self.settings.value("evescout_enable", "false") == "true"
@@ -324,6 +347,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.settings.setValue("tripwire_url", self.tripwire_url)
         self.settings.setValue("tripwire_user", self.tripwire_user)
         self.settings.setValue("tripwire_pass", self.tripwire_pass)
+
+        # Bridge info
+        self.settings.setValue("bridge_url", self.bridge_url)
 
         # Eve-Scout
         self.settings.setValue("evescout_enable", self.evescout_enable)
@@ -585,6 +611,19 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             self._message_box("Player destination", "CREST error when trying to set destination")
         self.pushButton_set_dest.setEnabled(True)
 
+    QtCore.Slot(int)
+    def bridge_thread_done(self, connections):
+        self.bridge_thread.quit()
+        while self.bridge_thread.isRunning():
+            time.sleep(0.01)
+        if connections > 0:
+            self._trip_message("Retreived {} Jump-bridges!".format(connections), MainWindow.MSG_OK)
+        elif connections == 0:
+            self._trip_message("No Jump-bridges exist", MainWindow.MSG_ERROR)
+
+        self.pushButton_bridge.setEnabled(True)
+        self.pushButton_find_path.setEnabled(True)
+
     @QtCore.Slot(int)
     def thread_done(self, connections, evescout_connections):
         self.worker_thread.quit()
@@ -665,6 +704,22 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                 self.crest_client_id,
                 self.crest_client_secret,
             )
+
+    @QtCore.Slot()
+    def btn_bridge_config_clicked(self):
+        bridge_dialog = BridgeDialog(self.bridge_url)
+        if bridge_dialog.exec_():
+            self.bridge_url = bridge_dialog.lineEdit_url.text()
+
+    @QtCore.Slot()
+    def btn_bridge_get_clicked(self):
+        if not self.worker_thread.isRunning():
+            self.pushButton_bridge.setEnabled(False)
+            self.pushButton_find_path.setEnabled(False)
+            self.bridge_processor.url = self.bridge_url
+            self.bridge_thread.start()
+        else:
+            self._trip_message("Error! Process already running", MainWindow.MSG_ERROR)
 
     @QtCore.Slot()
     def btn_trip_config_clicked(self):

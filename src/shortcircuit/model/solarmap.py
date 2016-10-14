@@ -33,6 +33,7 @@ class SolarMap:
 
     GATE = 0
     WORMHOLE = 1
+    BRIDGE = 2
 
     def __init__(self, eve_db):
         self.eve_db = eve_db
@@ -79,6 +80,9 @@ class SolarMap:
                 self.systems_list[source],
                 [SolarMap.WORMHOLE, [sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed]]
             )
+        elif con_type == SolarMap.BRIDGE:
+            self.systems_list[source].add_neighbor(self.systems_list[destination], [SolarMap.BRIDGE, None])
+            self.systems_list[destination].add_neighbor(self.systems_list[source], [SolarMap.BRIDGE, None])
         else:
             # you shouldn't be here
             pass
@@ -148,6 +152,8 @@ class SolarMap:
                                     proceed = False
                                 elif 0 < age_threshold < time_elapsed:
                                     proceed = False
+                            elif con_type == SolarMap.BRIDGE:
+                                    proceed = True
                             else:
                                 proceed = False
 

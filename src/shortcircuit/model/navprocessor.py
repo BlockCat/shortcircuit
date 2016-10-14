@@ -18,6 +18,7 @@ class NavProcessor(QtCore.QObject):
     def process(self):
         solar_map = self.nav.eve_db.get_solar_map()
         connections = self.nav.tripwire_augment(solar_map)
+
         if self.evescout_enable:
             evescout_connections = self.nav.evescout_augment(solar_map)
         else:

@@ -4,7 +4,7 @@ from evedb import EveDb
 from solarmap import SolarMap
 from evescout import EveScout
 from tripwire import Tripwire
-
+from bridgenetwork import BridgeNetwork
 
 class Navigation:
     """
@@ -16,6 +16,7 @@ class Navigation:
         self.trip_url = None
         self.trip_user = None
         self.trip_pass = None
+        self.bridge_url = None
         self.tripwire_set_login(trip_url, trip_user, trip_pass)
 
     def reset_chain(self):
@@ -34,6 +35,10 @@ class Navigation:
         trip = Tripwire(self.eve_db, self.trip_user, self.trip_pass, self.trip_url)
         return trip.augment_map(solar_map)
 
+    def bridgenetwork_augment(self, solar_map, bridge_url):
+        bridgenetwork = BridgeNetwork(self.eve_db, bridge_url)
+        return bridgenetwork.augment_map(solar_map)
+
     @staticmethod
     def _get_instructions(weight):
         if weight:
@@ -42,6 +47,8 @@ class Navigation:
             elif weight[0] == SolarMap.WORMHOLE:
                 [wh_sig, wh_code, _, _, _, _] = weight[1]
                 instructions = "Jump wormhole {}[{}]".format(wh_sig, wh_code)
+            elif weight[0] == SolarMap.BRIDGE:
+                instructions = "Take jump-bridge"
             else:
                 instructions = "Instructions unclear, initiate self-destruct"
         else:

@@ -11,6 +11,7 @@ Short Circuit (previously known as Pathfinder) is a desktop application which is
 4. Wormhole restrictions for: size, life, mass, last updated
 5. Instructions specify the signature and type of the wormhole (makes navigation easier)
 6. One-line output which can be copy-pasted for those lazy fleet members
+7. Basic Jump bridge support
 
 ## Usage
 ```bash
@@ -86,6 +87,12 @@ lifeLength: "24"
 life: "Stable"
 mass: "Stable"
 ...
+```
+
+Sample txt for Jumpbridge networks:
+```
+Poitot --> Jita
+B-R5RB --> SH1-6P
 ```
 
 ## EvE Online CREST API Challenge
