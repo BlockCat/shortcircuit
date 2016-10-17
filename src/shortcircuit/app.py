@@ -141,9 +141,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.crest_client_secret = None
 
         # Table configuration
-        self.tableWidget_path.setColumnCount(5)
+        self.tableWidget_path.setColumnCount(6)
         self.tableWidget_path.setHorizontalHeaderLabels(
-            ["System name", "Class", "Security", "Instructions", "Additional information"]
+            ["System name", "Class", "Security", "Instructions", "Additional information", "EveCheck"]
         )
         self.tableWidget_path.horizontalHeader().setStretchLastSection(True)
 

@@ -4,6 +4,7 @@ from evedb import EveDb
 from solarmap import SolarMap
 from evescout import EveScout
 from tripwire import Tripwire
+from gatecheck import GateCheck
 from bridgenetwork import BridgeNetwork
 
 class Navigation:
@@ -135,6 +136,8 @@ class Navigation:
                 age_threshold
             )
 
+        gatecheck = GateCheck(None)
+        warnings = gatecheck.get_warnings(path)
         route = []
         short_format = ""
         prev_gate = None  # Previous gate - will be the system ID of the previous system if connection was a gate
@@ -152,6 +155,8 @@ class Navigation:
             system_description = list(self.eve_db.system_desc[x])
             system_description.append(Navigation._get_instructions(weight))
             system_description.append(Navigation._get_additional_info(weight, weight_back))
+            system_description.append(warnings[x] if x in warnings else "")
+
             route.append(system_description)
 
             # Build short format message (travelling between multiple consecutive gates will be denoted as '...')

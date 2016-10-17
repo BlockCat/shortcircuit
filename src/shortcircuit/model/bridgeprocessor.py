@@ -16,9 +16,8 @@ class BridgeProcessor(QtCore.QObject):
         self.url = None
 
     def process(self):
-        solar_map = self.nav.eve_db.get_solar_map()
+        solar_map = self.nav.solar_map
         connections = self.nav.bridgenetwork_augment(solar_map, self.url)
-
 
         if connections > 0:
             self.nav.solar_map = solar_map

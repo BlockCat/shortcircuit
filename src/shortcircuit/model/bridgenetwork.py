@@ -29,9 +29,6 @@ class BridgeNetwork:
 
             source = self.eve_db.name2id(self.eve_db.normalize_name(match.group(1).strip()))
             destination = self.eve_db.name2id(self.eve_db.normalize_name(match.group(2).strip()))
-            print match.group(1) + ": " + match.group(2)
-            print source
-            print destination
             list.append((source, destination))
 
         return list
