@@ -4,6 +4,7 @@ from evedb import EveDb
 from solarmap import SolarMap
 from evescout import EveScout
 from tripwire import Tripwire
+from siggy import Siggy
 from gatecheck import GateCheck
 from bridgenetwork import BridgeNetwork
 
@@ -11,14 +12,17 @@ class Navigation:
     """
     Navigation
     """
-    def __init__(self, gates, system_desc, wh_codes, trip_url, trip_user, trip_pass):
+    def __init__(self, gates, system_desc, wh_codes, trip_url, trip_user, trip_pass, siggy_user, siggy_pass):
         self.eve_db = EveDb(gates, system_desc, wh_codes)
         self.solar_map = self.eve_db.get_solar_map()
         self.trip_url = None
         self.trip_user = None
         self.trip_pass = None
+        self.siggy_user = None
+        self.siggy_pass = None
         self.bridge_url = None
         self.tripwire_set_login(trip_url, trip_user, trip_pass)
+        self.siggy_set_login(siggy_user, siggy_pass)
 
     def reset_chain(self):
         self.solar_map = self.eve_db.get_solar_map()
@@ -27,6 +31,10 @@ class Navigation:
         self.trip_url = trip_url
         self.trip_user = trip_user
         self.trip_pass = trip_pass
+
+    def siggy_set_login(self, siggy_user, siggy_pass):
+        self.siggy_user = siggy_user
+        self.siggy_pass = siggy_pass
 
     def evescout_augment(self, solar_map):
         evescout = EveScout(self.eve_db)
@@ -39,6 +47,10 @@ class Navigation:
     def bridgenetwork_augment(self, solar_map, bridge_url):
         bridgenetwork = BridgeNetwork(self.eve_db, bridge_url)
         return bridgenetwork.augment_map(solar_map)
+
+    def siggy_augment(self, solar_map):
+        siggy = Siggy(self.eve_db, self.siggy_user, self.siggy_pass)
+        return siggy.augment_map(solar_map)
 
     @staticmethod
     def _get_instructions(weight):

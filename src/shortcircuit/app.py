@@ -10,10 +10,12 @@ from view.gui_main import Ui_MainWindow
 from view.gui_crest import Ui_CrestDialog
 from view.gui_tripwire import Ui_TripwireDialog
 from view.gui_bridge import Ui_BridgeDialog
+from view.gui_siggy import Ui_SiggyDialog
 from view.gui_about import Ui_AboutDialog
 from model.navigation import Navigation
 from model.navprocessor import NavProcessor
 from model.bridgeprocessor import BridgeProcessor
+from model.siggyprocessor import SiggyProcessor
 from model.evedb import EveDb
 from model.crestprocessor import CrestProcessor
 from model.versioncheck import VersionCheck
@@ -73,6 +75,16 @@ class BridgeDialog(QtGui.QDialog, Ui_BridgeDialog):
         self.setupUi(self)
         self.lineEdit_url.setText(bridge_url)
 
+class SiggyDialog(QtGui.QDialog, Ui_SiggyDialog):
+    """
+    Siggy  Configuration Window
+    """
+    def __init__(self, siggy_user, siggy_pass, parent=None):
+        super(SiggyDialog, self).__init__(parent)
+        self.setupUi(self)
+        self.lineEdit_user_siggy.setText(siggy_user)
+        self.lineEdit_pass_siggy.setText(siggy_pass)
+
 class TripwireDialog(QtGui.QDialog, Ui_TripwireDialog):
     """
     Tripwire Configuration Window
@@ -85,6 +97,8 @@ class TripwireDialog(QtGui.QDialog, Ui_TripwireDialog):
         self.lineEdit_pass.setText(trip_pass)
         self.checkBox_evescout.setChecked(evescout_enable)
         self.label_evescout_logo.mouseDoubleClickEvent = TripwireDialog.logo_double_click
+
+
 
     @staticmethod
     def logo_double_click(event):
@@ -135,6 +149,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.tripwire_url = None
         self.tripwire_user = None
         self.tripwire_pass = None
+        self.siggy_user = None
+        self.siggy_pass = None
         self.evescout_enable = None
         self.crest_implicit = None
         self.crest_client_id = None
@@ -163,7 +179,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             wh_codes,
             self.tripwire_url,
             self.tripwire_user,
-            self.tripwire_pass
+            self.tripwire_pass,
+            self.siggy_user,
+            self.siggy_pass
         )
 
         # Additional GUI setup
@@ -192,6 +210,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.bridge_processor.moveToThread(self.bridge_thread)
         self.bridge_processor.finished.connect(self.bridge_thread_done)
         self.bridge_thread.started.connect(self.bridge_processor.process)
+
+        #Siggy thread
+        self.siggy_thread = QtCore.QThread()
+        self.siggy_processor = SiggyProcessor(self.nav)
+        self.siggy_processor.moveToThread(self.siggy_thread)
+        self.siggy_processor.finished.connect(self.siggy_thread_done)
+        self.siggy_thread.started.connect(self.siggy_processor.process)
+
 
         # Version check thread
         self.version_thread = QtCore.QThread()
@@ -247,6 +273,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.pushButton_crest_config.clicked.connect(self.btn_crest_config_clicked)
         self.pushButton_trip_config.clicked.connect(self.btn_trip_config_clicked)
         self.pushButton_trip_get.clicked.connect(self.btn_trip_get_clicked)
+        self.pushButton_siggy_config.clicked.connect(self.btn_siggy_config_clicked)
+        self.pushButton_siggy_get.clicked.connect(self.btn_siggy_get_clicked)
         self.pushButton_bridge_conf.clicked.connect(self.btn_bridge_config_clicked)
         self.pushButton_bridge.clicked.connect(self.btn_bridge_get_clicked)
         self.pushButton_avoid_add.clicked.connect(self.btn_avoid_add_clicked)
@@ -283,6 +311,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.tripwire_user = self.settings.value("tripwire_user", "username")
         self.tripwire_pass = self.settings.value("tripwire_pass", "password")
 
+        self.siggy_user = self.settings.value("siggy_user", "username")
+        self.siggy_pass = self.settings.value("siggy_pass", "password")
         #Bridge info
         self.bridge_url = self.settings.value("bridge_url", "")
 
@@ -347,6 +377,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.settings.setValue("tripwire_url", self.tripwire_url)
         self.settings.setValue("tripwire_user", self.tripwire_user)
         self.settings.setValue("tripwire_pass", self.tripwire_pass)
+
+        self.settings.setValue("siggy_user", self.siggy_user)
+        self.settings.setValue("siggy_pass", self.siggy_pass)
 
         # Bridge info
         self.settings.setValue("bridge_url", self.bridge_url)
@@ -617,11 +650,26 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         while self.bridge_thread.isRunning():
             time.sleep(0.01)
         if connections > 0:
-            self._trip_message("Retreived {} Jump-bridges!".format(connections), MainWindow.MSG_OK)
+            self._trip_message("Retrieved {} Jump-bridges!".format(connections), MainWindow.MSG_OK)
         elif connections == 0:
             self._trip_message("No Jump-bridges exist", MainWindow.MSG_ERROR)
 
         self.pushButton_bridge.setEnabled(True)
+        self.pushButton_find_path.setEnabled(True)
+
+    QtCore.Slot(int)
+    def siggy_thread_done(self, connections):
+        self.siggy_thread.quit()
+        while self.siggy_thread.isRunning():
+            time.sleep(0.01)
+        if connections > 0:
+            self._trip_message("Retrieved {} Siggy connections".format(connections), MainWindow.MSG_OK)
+        elif connections == 0:
+            self._trip_message("No Siggy connections exist", MainWindow.MSG_ERROR)
+        else:
+            self._trip_message("A Siggy error occured :(", MainWindow.MSG_ERROR)
+
+        self.pushButton_siggy_get.setEnabled(True)
         self.pushButton_find_path.setEnabled(True)
 
     @QtCore.Slot(int)
@@ -713,13 +761,15 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def btn_bridge_get_clicked(self):
-        if not self.worker_thread.isRunning():
+        if not self.bridge_thread.isRunning():
             self.pushButton_bridge.setEnabled(False)
             self.pushButton_find_path.setEnabled(False)
             self.bridge_processor.url = self.bridge_url
             self.bridge_thread.start()
         else:
             self._trip_message("Error! Process already running", MainWindow.MSG_ERROR)
+
+
 
     @QtCore.Slot()
     def btn_trip_config_clicked(self):
@@ -738,6 +788,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                 self.tripwire_user,
                 self.tripwire_pass
             )
+
             self.evescout_enable = tripwire_dialog.checkBox_evescout.isChecked()
             if self.evescout_enable:
                 self.label_evescout_status.setText("Eve-Scout: enabled")
@@ -751,6 +802,26 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             self.pushButton_find_path.setEnabled(False)
             self.nav_processor.evescout_enable = self.evescout_enable
             self.worker_thread.start()
+        else:
+            self._trip_message("Error! Process already running", MainWindow.MSG_ERROR)
+
+    @QtCore.Slot()
+    def btn_siggy_config_clicked(self):
+        siggy_dialog = SiggyDialog(
+            self.siggy_user,
+            self.siggy_pass)
+
+        if siggy_dialog.exec_():
+            self.siggy_user = siggy_dialog.lineEdit_user_siggy.text()
+            self.siggy_pass = siggy_dialog.lineEdit_pass_siggy.text()
+            self.nav.siggy_set_login(self.siggy_user, self.siggy_pass)
+
+    @QtCore.Slot()
+    def btn_siggy_get_clicked(self):
+        if not self.siggy_thread.isRunning():
+            self.pushButton_siggy_get.setEnabled(False)
+            self.pushButton_find_path.setEnabled(False)
+            self.siggy_thread.start()
         else:
             self._trip_message("Error! Process already running", MainWindow.MSG_ERROR)
 

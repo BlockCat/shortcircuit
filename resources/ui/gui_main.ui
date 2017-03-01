@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>856</height>
+    <height>924</height>
    </rect>
   </property>
   <property name="font">
@@ -274,6 +274,49 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="pushButton_eve_login">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Log in with EvE</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources.qrc">
+               <normaloff>:/images/eve_logo.png</normaloff>:/images/eve_logo.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QPushButton" name="pushButton_bridge">
+             <property name="text">
+              <string>Get Bridge Network</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources.qrc">
+               <normaloff>:/images/bridge_icon.png</normaloff>:/images/bridge_icon.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="1">
             <widget class="QPushButton" name="pushButton_trip_config">
              <property name="sizePolicy">
@@ -320,23 +363,31 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QPushButton" name="pushButton_eve_login">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
+           <item row="3" column="1">
+            <widget class="QPushButton" name="pushButton_bridge_conf">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Log in with EvE</string>
+              <string>Bridge</string>
              </property>
              <property name="icon">
               <iconset resource="../resources.qrc">
-               <normaloff>:/images/eve_logo.png</normaloff>:/images/eve_logo.png</iconset>
+               <normaloff>:/images/config_icon.png</normaloff>:/images/config_icon.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPushButton" name="pushButton_siggy_get">
+             <property name="text">
+              <string>Get Siggy chain</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources.qrc">
+               <normaloff>:/images/siggy_logo.png</normaloff>:/images/siggy_logo.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -344,19 +395,21 @@
                <height>24</height>
               </size>
              </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QPushButton" name="pushButton_bridge">
-             <property name="text">
-              <string>Get Bridge Network</string>
+             <property name="checkable">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QPushButton" name="pushButton_bridge_conf">
+            <widget class="QPushButton" name="pushButton_siggy_config">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
-              <string>Bridge</string>
+              <string>Siggy</string>
              </property>
              <property name="icon">
               <iconset resource="../resources.qrc">

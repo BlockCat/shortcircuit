@@ -16,5 +16,9 @@
     <file>images/delete_icon.png</file>
     <file>images/evescout.png</file>
     <file>images/wh_icon.png</file>
+	<file>images/siggy_banner.png</file>
+	<file>images/siggy_logo.png</file>
+	<file>images/bridge_icon.png</file>
+	<file>images/bridge_banner.png</file>
 </qresource>
 </RCC>

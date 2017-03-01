@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui_bridge.ui'
+# Form implementation generated from reading ui file 'resources\ui\gui_bridge.ui'
 #
-# Created: Fri Oct 14 18:53:35 2016
+# Created: Wed Mar 01 13:13:44 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -11,7 +11,7 @@ from PySide import QtCore, QtGui
 
 class Ui_BridgeDialog(object):
     def setupUi(self, BridgeDialog):
-        BridgeDialog.setObjectName("TripwireDialog")
+        BridgeDialog.setObjectName("BridgeDialog")
         BridgeDialog.resize(400, 255)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -34,11 +34,6 @@ class Ui_BridgeDialog(object):
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 5, 0, 1, 2)
-        self.label_4 = QtGui.QLabel(BridgeDialog)
-        self.label_4.setText("")
-        self.label_4.setPixmap(QtGui.QPixmap(":/images/tripwire_banner.png"))
-        self.label_4.setObjectName("label_4")
-        self.gridLayout.addWidget(self.label_4, 0, 0, 1, 2)
         self.lineEdit_url = QtGui.QLineEdit(BridgeDialog)
         self.lineEdit_url.setObjectName("lineEdit_url")
         self.gridLayout.addWidget(self.lineEdit_url, 1, 1, 1, 1)
@@ -49,6 +44,11 @@ class Ui_BridgeDialog(object):
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.gridLayout.addLayout(self.horizontalLayout, 2, 1, 1, 1)
+        self.label_4 = QtGui.QLabel(BridgeDialog)
+        self.label_4.setText("")
+        self.label_4.setPixmap(QtGui.QPixmap(":/images/bridge_banner.png"))
+        self.label_4.setObjectName("label_4")
+        self.gridLayout.addWidget(self.label_4, 0, 0, 1, 2)
 
         self.retranslateUi(BridgeDialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), BridgeDialog.accept)
@@ -56,7 +56,7 @@ class Ui_BridgeDialog(object):
         QtCore.QMetaObject.connectSlotsByName(BridgeDialog)
 
     def retranslateUi(self, BridgeDialog):
-        BridgeDialog.setWindowTitle(QtGui.QApplication.translate("TripwireDialog", "Tripwire Configuration", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("TripwireDialog", "URL:", None, QtGui.QApplication.UnicodeUTF8))
+        BridgeDialog.setWindowTitle(QtGui.QApplication.translate("BridgeDialog", "Bridgenetwork Configuration", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("BridgeDialog", "URL:", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc

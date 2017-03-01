@@ -25,6 +25,8 @@ class SolarSystem:
     def get_weight(self, neighbor):
         return self.connected_to[neighbor]
 
+    def has_neighbor(self, neighbor):
+        return self.connected_to.__contains__(neighbor)
 
 class SolarMap:
     """
@@ -72,14 +74,17 @@ class SolarMap:
             self.systems_list[destination].add_neighbor(self.systems_list[source], [SolarMap.GATE, None])
         elif con_type == SolarMap.WORMHOLE:
             [sig_source, code_source, sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed] = con_info
-            self.systems_list[source].add_neighbor(
-                self.systems_list[destination],
-                [SolarMap.WORMHOLE, [sig_source, code_source, wh_size, wh_life, wh_mass, time_elapsed]]
-            )
-            self.systems_list[destination].add_neighbor(
-                self.systems_list[source],
-                [SolarMap.WORMHOLE, [sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed]]
-            )
+
+            #Check if it doesn't overwrite a bridge or gate
+            if not self.systems_list[source].has_neighbor(self.systems_list[destination]) or self.systems_list[source].get_weight(self.systems_list[destination])[0] == SolarMap.WORMHOLE:
+                self.systems_list[source].add_neighbor(
+                    self.systems_list[destination],
+                    [SolarMap.WORMHOLE, [sig_source, code_source, wh_size, wh_life, wh_mass, time_elapsed]]
+                )
+                self.systems_list[destination].add_neighbor(
+                    self.systems_list[source],
+                    [SolarMap.WORMHOLE, [sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed]]
+                )
         elif con_type == SolarMap.BRIDGE:
             self.systems_list[source].add_neighbor(self.systems_list[destination], [SolarMap.BRIDGE, None])
             self.systems_list[destination].add_neighbor(self.systems_list[source], [SolarMap.BRIDGE, None])

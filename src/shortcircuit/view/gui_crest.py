@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'resources\ui\gui_crest.ui'
 #
-# Created: Tue Oct 04 22:22:08 2016
+# Created: Wed Mar 01 13:13:45 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
