@@ -75,15 +75,32 @@ class SolarMap:
         elif con_type == SolarMap.WORMHOLE:
             [sig_source, code_source, sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed] = con_info
 
+            has_neighbor = self.systems_list[source].has_neighbor(self.systems_list[destination])
+
             #Check if it doesn't overwrite a bridge or gate
-            if not self.systems_list[source].has_neighbor(self.systems_list[destination]) or self.systems_list[source].get_weight(self.systems_list[destination])[0] == SolarMap.WORMHOLE:
+
+            if not has_neighbor or self.systems_list[source].get_weight(self.systems_list[destination])[0] == SolarMap.WORMHOLE:
+                source_weight = [SolarMap.WORMHOLE, [sig_source, code_source, wh_size, wh_life, wh_mass, time_elapsed]]
+                destination_weight = [SolarMap.WORMHOLE, [sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed]]
+
+                # If the connection already exists and is a wormhole, enhance the information
+                if has_neighbor:
+                    source_weight = self.enhance_wormhole_info(
+                        self.systems_list[source].get_weight(self.systems_list[destination]),
+                        source_weight
+                    )
+                    destination_weight = self.enhance_wormhole_info(
+                        self.systems_list[destination].get_weight(self.systems_list[source]),
+                        destination_weight
+                    )
+
                 self.systems_list[source].add_neighbor(
                     self.systems_list[destination],
-                    [SolarMap.WORMHOLE, [sig_source, code_source, wh_size, wh_life, wh_mass, time_elapsed]]
+                    source_weight
                 )
                 self.systems_list[destination].add_neighbor(
                     self.systems_list[source],
-                    [SolarMap.WORMHOLE, [sig_dest, code_dest, wh_size, wh_life, wh_mass, time_elapsed]]
+                    destination_weight
                 )
         elif con_type == SolarMap.BRIDGE:
             self.systems_list[source].add_neighbor(self.systems_list[destination], [SolarMap.BRIDGE, None])
@@ -91,6 +108,31 @@ class SolarMap:
         else:
             # you shouldn't be here
             pass
+
+    def enhance_wormhole_info(self, oldInfo, newInfo):
+        [old_connection_type, [old_sig_source, old_code_source, old_wh_size, old_wh_life, old_wh_mass, old_time_elapsed]] = oldInfo
+        [new_connection_type, [new_sig_source, new_code_source, new_wh_size, new_wh_life, new_wh_mass, new_time_elapsed]] = newInfo
+
+        connection_type = self.retain_latest_info(old_connection_type, new_connection_type, old_time_elapsed, new_time_elapsed)
+        sig_source = self.retain_latest_info(old_sig_source, new_sig_source, old_time_elapsed, new_time_elapsed)
+        code_source = self.retain_latest_info(old_code_source, new_code_source, old_time_elapsed, new_time_elapsed)
+        wh_size = self.retain_latest_info(old_wh_size, new_wh_size, old_time_elapsed, new_time_elapsed)
+        wh_life =self.retain_latest_info(old_wh_life, new_wh_life, old_time_elapsed, new_time_elapsed)
+        wh_mass =self.retain_latest_info(old_wh_mass, new_wh_mass, old_time_elapsed, new_time_elapsed)
+        time_elapsed = self.retain_latest_info(old_time_elapsed, new_time_elapsed, old_time_elapsed, new_time_elapsed)
+        return [connection_type, [sig_source, code_source, wh_size, wh_life, wh_mass, time_elapsed]]
+
+    def retain_latest_info(self, old, new, old_time, new_time):
+        if old is None:
+            return new
+        if new is None:
+            return old
+
+        #If the old time has been updated before the new time, or the old does not exist
+        if old_time > new_time:
+            return new
+        else:
+            return old
 
     def __contains__(self, item):
         return item in self.systems_list
