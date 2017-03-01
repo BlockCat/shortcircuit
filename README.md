@@ -5,13 +5,14 @@ Short Circuit (previously known as Pathfinder) is a desktop application which is
 
 **Features:**
 
-1. Ability to add wormhole connections from [Tripwire](https://tripwire.eve-apps.com/)
+1. Ability to add wormhole connections from [Tripwire](https://tripwire.eve-apps.com/) and [Siggy](https://siggy.borkedlabs.com/pages/welcome)
 2. CREST authentication for reading the player location and setting the destination in-game
 3. Avoidance list
 4. Wormhole restrictions for: size, life, mass, last updated
 5. Instructions specify the signature and type of the wormhole (makes navigation easier)
 6. One-line output which can be copy-pasted for those lazy fleet members
 7. Basic Jump bridge support
+8. Kills that happened on your route thanks to [Eve-gatecheck](http://eve-gatecheck.space/eve/)
 
 ## Usage
 ```bash
