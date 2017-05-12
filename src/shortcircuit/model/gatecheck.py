@@ -88,9 +88,23 @@ class GateCheck:
 	"""
     def get_gates(self, route):
 
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+            'Cookie': 'PHPSESSID=7ketdgd9ifmtfdbmipk22cvfe2; _ga=GA1.2.2041207838.1491633281; _gat=1',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': '*/*',
+            'Host': 'eve-gatecheck.space',
+            'Referer': 'http:"//eve-gatecheck.space/eve',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Connection': 'keep-alive',
+            'Accept-Language': 'nl,en; q=0.9,fr;q=0.6',
+            
+
+        }
+
         query = ",".join(str(x) for x in route)
         try:
-            r = requests.get("http://eve-gatecheck.space/eve/get_kills.php?systems=" + query)
+            r = requests.get("http://eve-gatecheck.space/eve/get_kills.php?systems=" + query, headers = headers)
         except requests.exceptions.RequestException:
             logging.warning("Unable to connect to eve-gatecheck")
         else:
@@ -103,10 +117,14 @@ class GateCheck:
 
         warnings = {} #solarid: "hictors, dictors and smartbombs, 2 killed at Jita gate, killed at Amarr gate"
 
+        print(json)
+
         if (json == None): return warnings
+        if ('success' in json and json.has_key['success'] == False): return warnings
         for system, kills in json.iteritems():
             if system == "premium": continue
 
+            print(json)
             systemId = convert_to_int(system)
             totalKills = convert_to_int(kills["kills"]["killCount"])
             warningLine = ["{} kills".format(totalKills)]
